@@ -3,6 +3,7 @@
 ## cleaning socket volume
 docker container rm dapr-pluggable-component
 docker container rm daprd-pluggable-component
+docker container rm dapr-java-pluggable-component
 docker volume rm examples_socket
 
 
