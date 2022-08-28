@@ -22,4 +22,4 @@ WORKDIR /
 
 COPY --from=build /run /run
 
-CMD ["/run"]
+ENTRYPOINT ["/run"]
