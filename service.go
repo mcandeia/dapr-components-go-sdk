@@ -30,8 +30,8 @@ const (
 
 // Generates a chan bool that automatically gets closed when the process
 // receives a SIGINT.
-func makeAbortChan() chan bool {
-	abortChan := make(chan bool)
+func makeAbortChan() chan struct{} {
+	abortChan := make(chan struct{})
 	sigChan := make(chan os.Signal, 1)
 
 	go func() {

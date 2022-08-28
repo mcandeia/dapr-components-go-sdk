@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  component:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        COMPONENT: memory
+    environment:
+      - DAPR_COMPONENT_SOCKET_PATH=/var/run/dapr-state.store-v1-default.sock
+    volumes:
+      - socket:/var/run
+  daprd:
+    image: "ghcr.io/mcandeia/dapr/daprd:1.9.0-pluggable-components-alpha.5-linux-amd64"
+    command: "./daprd --app-id pluggable-test --components-path=/components"
+    depends_on:
+      - component
+    ports:
+      - "3500:3500"
+    volumes:
+      - socket:/var/run
+      - ./components:/components
+volumes:
+  socket:
