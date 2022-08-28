@@ -17,6 +17,7 @@ import (
 	"errors"
 
 	contribState "github.com/dapr/components-contrib/state"
+	"github.com/dapr/kit/logger"
 
 	proto "github.com/dapr/dapr/pkg/proto/components/v1"
 
@@ -24,7 +25,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-var ErrNoneComponentsFound = errors.New("at least one component service should be defined")
+var (
+	svcLogger              = logger.NewLogger("dapr-component")
+	ErrNoneComponentsFound = errors.New("at least one component service should be defined")
+)
 
 type componentOpts struct {
 	useGrpcServer []func(*grpc.Server)
@@ -35,6 +39,7 @@ type Option = func(*componentOpts)
 func UseStateStore(stateStore contribState.Store) Option {
 	return func(co *componentOpts) {
 		co.useGrpcServer = append(co.useGrpcServer, func(s *grpc.Server) {
+			svcLogger.Info("dapr state store was registered")
 			proto.RegisterStateStoreServer(s, state.NewWrapper(stateStore))
 		})
 	}

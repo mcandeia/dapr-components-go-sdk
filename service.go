@@ -17,6 +17,7 @@ import (
 	"errors"
 	"net"
 	"os"
+	"os/signal"
 
 	"google.golang.org/grpc"
 )
@@ -27,6 +28,21 @@ const (
 	unixSocketPathEnvVar = "DAPR_COMPONENT_SOCKET_PATH"
 )
 
+// Generates a chan bool that automatically gets closed when the process
+// receives a SIGINT.
+func makeAbortChan() chan bool {
+	abortChan := make(chan bool)
+	sigChan := make(chan os.Signal, 1)
+
+	go func() {
+		<-sigChan
+		close(abortChan)
+	}()
+
+	signal.Notify(sigChan, os.Interrupt)
+	return abortChan
+}
+
 // Run starts the component server with the given options.
 func Run(opts ...Option) error {
 	socket, ok := os.LookupEnv(unixSocketPathEnvVar)
@@ -34,10 +50,19 @@ func Run(opts ...Option) error {
 		return ErrSocketNotDefined
 	}
 
+	svcLogger.Infof("using socket defnied at '%s'", socket)
+
 	lis, err := net.Listen("unix", socket)
 	if err != nil {
 		return err
 	}
+	defer lis.Close()
+
+	abort := makeAbortChan()
+	go func() { // must close listener to abort while trying to accept connection
+		<-abort
+		lis.Close()
+	}()
 
 	svcOpts := &componentOpts{}
 	for _, opt := range opts {
@@ -51,4 +76,11 @@ func Run(opts ...Option) error {
 	}
 
 	return server.Serve(lis)
+}
+
+// MustRun same as run but panics on error
+func MustRun(opts ...Option) {
+	if err := Run(opts...); err != nil {
+		panic(err)
+	}
 }
