@@ -13,13 +13,13 @@ RUN go mod download
 
 COPY ${COMPONENT}/*.go ./
 
-RUN CGO_ENABLED=0 go build -o /run
+RUN CGO_ENABLED=0 go build -o /component
 
 ## Deploy
 FROM gcr.io/distroless/static-debian11
 
 WORKDIR /
 
-COPY --from=build /run /run
+COPY --from=build /component /component
 
-ENTRYPOINT ["/run"]
+ENTRYPOINT ["/component"]

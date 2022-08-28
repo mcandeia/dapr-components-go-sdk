@@ -6,7 +6,17 @@ This repository is a POC of a SDK for [Dapr gRPC Components (a.k.a pluggable com
 
 Start by running `./run.sh` inside `/examples` folder. It will start the daprd runtime with pluggable components version + in memory state store implementation from components-contrib.
 
-## Implementing a Pluggable State Store component.
+See it working:
+
+```sh
+curl -X POST -H "Content-Type: application/json" -d '[{ "key": "name", "value": "Bruce Wayne"}]' http://localhost:3500/v1.0/state/default
+```
+
+```sh
+curl http://localhost:3500/v1.0/state/default/name
+```
+
+## Implementing a Pluggable State Store component
 
 To create your own implementation:
 

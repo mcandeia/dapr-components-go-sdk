@@ -13,4 +13,4 @@ metadata:
 spec:
   type: state.store
   version: v1
-  initTimeout: 1m
+  initTimeout: 10s

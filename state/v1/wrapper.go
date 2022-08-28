@@ -30,6 +30,38 @@ type store struct {
 	impl contribState.Store
 }
 
+//nolint:nosnakecase
+var consistencyModels = map[common.StateOptions_StateConsistency]string{
+	common.StateOptions_CONSISTENCY_EVENTUAL:    "eventual",
+	common.StateOptions_CONSISTENCY_STRONG:      "strong",
+	common.StateOptions_CONSISTENCY_UNSPECIFIED: "strong",
+}
+
+//nolint:nosnakecase
+func toConsistency(consistency common.StateOptions_StateConsistency) string {
+	c, ok := consistencyModels[consistency]
+	if !ok {
+		return "strong"
+	}
+	return c
+}
+
+//nolint:nosnakecase
+var concurrencyModels = map[common.StateOptions_StateConcurrency]string{
+	common.StateOptions_CONCURRENCY_FIRST_WRITE: "first-write",
+	common.StateOptions_CONCURRENCY_LAST_WRITE:  "last-write",
+	common.StateOptions_CONCURRENCY_UNSPECIFIED: "last-write",
+}
+
+//nolint:nosnakecase
+func toConcurrency(concurrency common.StateOptions_StateConcurrency) string {
+	c, ok := concurrencyModels[concurrency]
+	if !ok {
+		return "last-write"
+	}
+	return c
+}
+
 func (s *store) Init(ctx context.Context, metadata *proto.MetadataRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, s.impl.Init(contribState.Metadata{
 		Properties: metadata.Properties,
@@ -55,8 +87,8 @@ func toDeleteRequest(req *proto.DeleteRequest) *contribState.DeleteRequest {
 		Metadata: req.Metadata,
 		Options: internal.IfNotNil(req.Options, func(f *common.StateOptions) contribState.DeleteStateOption {
 			return contribState.DeleteStateOption{
-				Concurrency: string(f.Concurrency),
-				Consistency: string(f.Consistency),
+				Concurrency: toConcurrency(f.Concurrency),
+				Consistency: toConsistency(f.Consistency),
 			}
 		}),
 	}
@@ -103,8 +135,8 @@ func toSetRequest(req *proto.SetRequest) *contribState.SetRequest {
 		Metadata: req.Metadata,
 		Options: internal.IfNotNil(req.Options, func(f *common.StateOptions) contribState.SetStateOption {
 			return contribState.SetStateOption{
-				Concurrency: string(f.Concurrency),
-				Consistency: string(f.Consistency),
+				Concurrency: toConcurrency(f.Concurrency),
+				Consistency: toConsistency(f.Consistency),
 			}
 		}),
 	}
@@ -115,7 +147,7 @@ func (s *store) Set(_ context.Context, req *proto.SetRequest) (*emptypb.Empty, e
 }
 
 func (s *store) Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, contribState.Ping(s.impl)
+	return &emptypb.Empty{}, nil
 }
 
 func (s *store) BulkDelete(_ context.Context, req *proto.BulkDeleteRequest) (*emptypb.Empty, error) {
