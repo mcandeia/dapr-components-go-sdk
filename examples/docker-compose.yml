@@ -1,6 +1,7 @@
 version: '3.9'
 services:
   component:
+    container_name: dapr-pluggable-component
     build:
       context: ./
       dockerfile: Dockerfile
@@ -11,8 +12,9 @@ services:
     volumes:
       - socket:/var/run
   daprd:
-    image: "ghcr.io/mcandeia/dapr/daprd:1.9.0-pluggable-components-alpha.5-linux-amd64"
-    command: "./daprd --app-id pluggable-test --components-path=/components"
+    container_name: daprd-pluggable-component
+    image: "ghcr.io/mcandeia/dapr/daprd:1.9.0-pluggable-components-alpha.7-linux-amd64"
+    command: "./daprd --log-level=debug --app-id pluggable-test --components-path=/components"
     depends_on:
       - component
     ports:

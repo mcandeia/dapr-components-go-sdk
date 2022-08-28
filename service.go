@@ -18,6 +18,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"google.golang.org/grpc"
 )
@@ -29,7 +30,7 @@ const (
 )
 
 // Generates a chan bool that automatically gets closed when the process
-// receives a SIGINT.
+// receives a SIGINT or SIGTERM.
 func makeAbortChan() chan struct{} {
 	abortChan := make(chan struct{})
 	sigChan := make(chan os.Signal, 1)
@@ -39,7 +40,12 @@ func makeAbortChan() chan struct{} {
 		close(abortChan)
 	}()
 
-	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan,
+		os.Interrupt,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
 	return abortChan
 }
 
@@ -50,7 +56,7 @@ func Run(opts ...Option) error {
 		return ErrSocketNotDefined
 	}
 
-	svcLogger.Infof("using socket defnied at '%s'", socket)
+	svcLogger.Infof("using socket defined at '%s'", socket)
 
 	lis, err := net.Listen("unix", socket)
 	if err != nil {
