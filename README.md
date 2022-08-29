@@ -9,12 +9,13 @@ Start by running `./run.sh` inside `/examples` folder. It will start the daprd r
 See it working:
 
 ```sh
-curl -X POST -H "Content-Type: application/json" -d '[{ "key": "name", "value": "Bruce Wayne"}]' http://localhost:3500/v1.0/state/default
+curl -X POST -H "Content-Type: application/json" -d '[{ "key": "name", "value": "Bruce Waynse", "metadata": { "ttlInSeconds": "60"}}]' http://localhost:3500/v1.0/state/default
 ```
 
 ```sh
 curl http://localhost:3500/v1.0/state/default/name
 ```
+
 
 ## Implementing a Pluggable State Store component
 
@@ -28,7 +29,7 @@ This will build your component and bootstrap the dapr runtime with the default o
 
 ## Getting started
 
-Creating a new component is nothing more than implement a StateStore interface and Run the dapr component server.
+Creating a new component is nothing more than implement a [StateStore](https://github.com/dapr/components-contrib/blob/master/state/store.go#L23) interface and Run the dapr component server.
 
 ```golang
 package main

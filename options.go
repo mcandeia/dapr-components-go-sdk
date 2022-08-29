@@ -36,6 +36,7 @@ type componentOpts struct {
 
 type Option = func(*componentOpts)
 
+// UseStateStore sets the component state store implementation.
 func UseStateStore(stateStore contribState.Store) Option {
 	return func(co *componentOpts) {
 		co.useGrpcServer = append(co.useGrpcServer, func(s *grpc.Server) {
@@ -45,6 +46,8 @@ func UseStateStore(stateStore contribState.Store) Option {
 	}
 }
 
+// validate check options are valid.
+// if none component was specified so it will return an error.
 func (c *componentOpts) validate() error {
 	if c.useGrpcServer == nil || len(c.useGrpcServer) == 0 {
 		return ErrNoneComponentsFound
@@ -52,6 +55,7 @@ func (c *componentOpts) validate() error {
 	return nil
 }
 
+// apply applies the options to the given grpcServer.
 func (c *componentOpts) apply(s *grpc.Server) error {
 	if err := c.validate(); err != nil {
 		return err

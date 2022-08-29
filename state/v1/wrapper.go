@@ -26,38 +26,45 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	consistencyEventual   = "eventual"
+	consistencyStrong     = "strong"
+	concurrencyLastWrite  = "last-write"
+	concurrencyFirstWrite = "first-write"
+)
+
 type store struct {
 	impl contribState.Store
 }
 
 //nolint:nosnakecase
 var consistencyModels = map[common.StateOptions_StateConsistency]string{
-	common.StateOptions_CONSISTENCY_EVENTUAL:    "eventual",
-	common.StateOptions_CONSISTENCY_STRONG:      "strong",
-	common.StateOptions_CONSISTENCY_UNSPECIFIED: "strong",
+	common.StateOptions_CONSISTENCY_EVENTUAL:    consistencyEventual,
+	common.StateOptions_CONSISTENCY_STRONG:      consistencyStrong,
+	common.StateOptions_CONSISTENCY_UNSPECIFIED: consistencyStrong,
 }
 
 //nolint:nosnakecase
 func toConsistency(consistency common.StateOptions_StateConsistency) string {
 	c, ok := consistencyModels[consistency]
 	if !ok {
-		return "strong"
+		return consistencyStrong
 	}
 	return c
 }
 
 //nolint:nosnakecase
 var concurrencyModels = map[common.StateOptions_StateConcurrency]string{
-	common.StateOptions_CONCURRENCY_FIRST_WRITE: "first-write",
-	common.StateOptions_CONCURRENCY_LAST_WRITE:  "last-write",
-	common.StateOptions_CONCURRENCY_UNSPECIFIED: "last-write",
+	common.StateOptions_CONCURRENCY_FIRST_WRITE: concurrencyFirstWrite,
+	common.StateOptions_CONCURRENCY_LAST_WRITE:  concurrencyLastWrite,
+	common.StateOptions_CONCURRENCY_UNSPECIFIED: concurrencyLastWrite,
 }
 
 //nolint:nosnakecase
 func toConcurrency(concurrency common.StateOptions_StateConcurrency) string {
 	c, ok := concurrencyModels[concurrency]
 	if !ok {
-		return "last-write"
+		return concurrencyLastWrite
 	}
 	return c
 }
