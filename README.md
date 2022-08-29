@@ -4,18 +4,19 @@ This repository is a POC of a SDK for [Dapr gRPC Components (a.k.a pluggable com
 
 ## Running examples
 
-Start by running `./run.sh` inside `/examples` folder. It will start the daprd runtime with pluggable components version + in memory state store implementation from components-contrib.
+Start by running `./run.sh` inside `/examples` folder. It will start the daprd runtime with pluggable components version + default in memory state store implementation from components-contrib, use `./run.sh redis` to run redis instead.
+
+> Run `ARGS=--no-cache ./run.sh` if you want to rebuild the docker image.
 
 See it working:
 
 ```sh
-curl -X POST -H "Content-Type: application/json" -d '[{ "key": "name", "value": "Bruce Waynse", "metadata": { "ttlInSeconds": "60"}}]' http://localhost:3500/v1.0/state/default
+curl -X POST -H "Content-Type: application/json" -d '[{ "key": "name", "value": "Bruce Wayne", "metadata": { "ttlInSeconds": "60"}}]' http://localhost:3500/v1.0/state/default
 ```
 
 ```sh
 curl http://localhost:3500/v1.0/state/default/name
 ```
-
 
 ## Implementing a Pluggable State Store component
 
@@ -23,7 +24,8 @@ To create your own implementation:
 
 1. Create a new folder under `/examples`
 2. Implement a stateStore using the sdk
-3. Run `./run.sh your_folder_goes_here`
+3. create a `component.yml` (copying from other sources and changing the component-specific metadata)
+4. Run `./run.sh your_folder_goes_here`
 
 This will build your component and bootstrap the dapr runtime with the default options.
 

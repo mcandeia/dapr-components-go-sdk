@@ -1,4 +1,7 @@
 #!/bin/bash
+COMPONENT=${1:-memory}
 
-COMPONENT=${1:-memory} docker-compose build --no-cache
-COMPONENT=${1:-memory} docker-compose up
+cp $COMPONENT/component.yml components/.
+
+COMPONENT=$COMPONENT docker-compose build $ARGS
+COMPONENT=$COMPONENT docker-compose up
