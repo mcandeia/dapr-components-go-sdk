@@ -15,8 +15,10 @@ package state
 
 import (
 	"context"
+	"encoding/json"
 
 	contribState "github.com/dapr/components-contrib/state"
+	contribQuery "github.com/dapr/components-contrib/state/query"
 
 	"github.com/mcandeia/dapr-components-go-sdk/internal"
 
@@ -26,6 +28,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -41,6 +44,7 @@ var defaultStore = &store{}
 type store struct {
 	impl          contribState.Store
 	transactional contribState.TransactionalStore
+	querier       contribState.Querier
 }
 
 //nolint:nosnakecase
@@ -229,11 +233,64 @@ func (s *store) Multi(_ context.Context, req *proto.TransactionalStateRequest) (
 	})
 }
 
+func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryResponse, error) {
+	filters, err := internal.MapValuesErr(req.Query.Filter, func(f *anypb.Any) (any, error) {
+		var v any
+		return v, json.Unmarshal(f.Value, &v)
+	})
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.querier.Query(&contribState.QueryRequest{
+		Query: contribQuery.Query{
+			Filters: filters,
+			Sort: internal.Map(req.Query.Sort, func(s *proto.Sorting) contribQuery.Sorting {
+				return contribQuery.Sorting{
+					Key:   s.Key,
+					Order: s.Order.String(),
+				}
+			}),
+			Page: contribQuery.Pagination{
+				Limit: int(req.Query.Pagination.Limit),
+				Token: req.Query.Pagination.Token,
+			},
+			Filter: nil,
+		},
+		Metadata: req.Metadata,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.QueryResponse{
+		Items: internal.Map(resp.Results, func(item contribState.QueryItem) *proto.QueryItem {
+			return &proto.QueryItem{
+				Key:  item.Key,
+				Data: item.Data,
+				Etag: internal.IfNotNil(item.ETag, func(etagValue *string) *common.Etag {
+					return &common.Etag{
+						Value: *etagValue,
+					}
+				}),
+				Error:       item.Error,
+				ContentType: *item.ContentType,
+			}
+		}),
+		Token:    resp.Token,
+		Metadata: resp.Metadata,
+	}, nil
+}
+
 func Register(server *grpc.Server, store contribState.Store) {
 	defaultStore.impl = store
 	proto.RegisterStateStoreServer(server, defaultStore)
 	if trtnl, ok := store.(contribState.TransactionalStore); ok {
 		proto.RegisterTransactionalStateStoreServer(server, defaultStore)
 		defaultStore.transactional = trtnl
+	}
+
+	if querier, ok := store.(contribState.Querier); ok {
+		proto.RegisterQueriableStateStoreServer(server, defaultStore)
+		defaultStore.querier = querier
 	}
 }

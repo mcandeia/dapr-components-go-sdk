@@ -23,6 +23,20 @@ func Map[From any, To any](from []From, mapper func(From) To) []To {
 	return res
 }
 
+// MapValues transform map values by applying mapper func.
+func MapValuesErr[From any, To any](from map[string]From, mapper func(From) (To, error)) (map[string]To, error) {
+	res := make(map[string]To, len(from))
+
+	for key, value := range from {
+		mapped, err := mapper(value)
+		if err != nil {
+			return nil, err
+		}
+		res[key] = mapped
+	}
+	return res, nil
+}
+
 // IfNotNilP apply the mapper func if the value is not nil returns nil otherwise.
 func IfNotNilP[From any, To any](value *From, mapper func(*From) To) *To {
 	if value != nil {

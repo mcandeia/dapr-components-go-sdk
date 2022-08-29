@@ -1,5 +1,5 @@
-github.com/mcandeia/dapr v0.0.0-20220829161414-4e684ac26d42 h1:MAnWnhrCqb/tkxGt0yEHiQnpixFTi9Z2Fi1Wu2YbnTs=
-github.com/mcandeia/dapr v0.0.0-20220829161414-4e684ac26d42/go.mod h1:id6jlg9wW4fuvsCnJMqPKllBZFpb6Baqn0CbnDrEbPg=
+github.com/mcandeia/dapr v0.0.0-20220829202438-ebb3b1b2ae36 h1:iEDJBANdIPP16ljRd7hmukRoH7k2tHHodCuCHkk90k4=
+github.com/mcandeia/dapr v0.0.0-20220829202438-ebb3b1b2ae36/go.mod h1:id6jlg9wW4fuvsCnJMqPKllBZFpb6Baqn0CbnDrEbPg=
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e h1:T8NU3HyQ8ClP4SEE+KbFlg6n0NhuTsN4MyznaarGsZM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
