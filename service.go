@@ -56,12 +56,18 @@ func Run(opts ...Option) error {
 		return ErrSocketNotDefined
 	}
 
+	// remove socket if it is already created.
+	if err := os.Remove(socket); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
 	svcLogger.Infof("using socket defined at '%s'", socket)
 
 	lis, err := net.Listen("unix", socket)
 	if err != nil {
 		return err
 	}
+
 	defer lis.Close()
 
 	abort := makeAbortChan()

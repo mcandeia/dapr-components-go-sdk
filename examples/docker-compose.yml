@@ -3,8 +3,8 @@ services:
   component:
     container_name: dapr-pluggable-component
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: ./examples/Dockerfile
       args:
         COMPONENT: ${COMPONENT:-memory}
     environment:
@@ -12,20 +12,12 @@ services:
     volumes:
       - socket:/var/run
 
-  java-component:
-    container_name: dapr-java-pluggable-component
-    image: "tmacam/dapr-memstore-java:latest"
-    environment:
-      - DAPR_COMPONENT_SOCKET_PATH=/var/run/dapr-state.javamemstore-v1-myjavamemstore.sock
-    volumes:
-      - socket:/var/run
   daprd:
     container_name: daprd-pluggable-component
     image: "ghcr.io/mcandeia/dapr/daprd:1.9.0-pluggable-components-alpha.7-linux-amd64"
     command: "./daprd --log-level=debug --app-id pluggable-test --components-path=/components"
     depends_on:
       - component
-      - java-component
     ports:
       - "3500:3500"
     volumes:

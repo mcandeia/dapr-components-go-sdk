@@ -25,3 +25,5 @@ require (
 )
 
 replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220827174239-0397ce99b343
+
+replace github.com/mcandeia/dapr-components-go-sdk => ../../.
