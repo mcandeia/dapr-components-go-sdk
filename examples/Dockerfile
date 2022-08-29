@@ -22,17 +22,14 @@ RUN go mod edit -replace github.com/mcandeia/dapr-components-go-sdk=/sdk/
 RUN go mod download
 
 COPY examples/${COMPONENT}/*.go ./
-COPY examples/umask_entrypoint_wrapper.sh ./
 
-RUN CGO_ENABLED=0 go build -o component
-
-CMD ["./umask_entrypoint_wrapper.sh", "./component"]
+RUN CGO_ENABLED=0 go build -o /component
 
 ## Deploy
-#FROM gcr.io/distroless/static-debian11
+FROM gcr.io/distroless/static-debian11
 
-#WORKDIR /
+WORKDIR /
 
-#COPY --from=build /component /component
+COPY --from=build /component /component
 
-#ENTRYPOINT ["/component"]
+ENTRYPOINT ["/component"]

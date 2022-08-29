@@ -51,6 +51,9 @@ func makeAbortChan() chan struct{} {
 
 // Run starts the component server with the given options.
 func Run(opts ...Option) error {
+	//nolint
+	syscall.Umask(000) // allow this process to create files that could be read-write for other processes
+
 	socket, ok := os.LookupEnv(unixSocketPathEnvVar)
 	if !ok {
 		return ErrSocketNotDefined
