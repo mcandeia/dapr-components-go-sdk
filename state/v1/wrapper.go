@@ -23,6 +23,9 @@ import (
 	"github.com/dapr/dapr/pkg/proto/common/v1"
 	proto "github.com/dapr/dapr/pkg/proto/components/v1"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -33,8 +36,11 @@ const (
 	concurrencyFirstWrite = "first-write"
 )
 
+var defaultStore = &store{}
+
 type store struct {
-	impl contribState.Store
+	impl          contribState.Store
+	transactional contribState.TransactionalStore
 }
 
 //nolint:nosnakecase
@@ -193,8 +199,41 @@ func (s *store) BulkSet(_ context.Context, req *proto.BulkSetRequest) (*emptypb.
 	}))
 }
 
-func NewWrapper(impl contribState.Store) proto.StateStoreServer {
-	return &store{
-		impl: impl,
+func toTransactionalStateOperation(op *proto.TransactionalStateOperation) contribState.TransactionalStateOperation {
+	var (
+		request   any
+		operation contribState.OperationType
+	)
+	if delete := op.GetDelete(); delete != nil {
+		request = delete
+		operation = contribState.Delete
+	} else {
+		request = op.GetSet()
+		operation = contribState.Upsert
+	}
+
+	return contribState.TransactionalStateOperation{
+		Request:   request,
+		Operation: operation,
+	}
+}
+
+func (s *store) Multi(_ context.Context, req *proto.TransactionalStateRequest) (*emptypb.Empty, error) {
+	if s.transactional == nil {
+		return &emptypb.Empty{}, status.Errorf(codes.Unimplemented, "method Multi not implemented")
+	}
+
+	return &emptypb.Empty{}, s.transactional.Multi(&contribState.TransactionalStateRequest{
+		Operations: internal.Map(req.Operations, toTransactionalStateOperation),
+		Metadata:   req.Metadata,
+	})
+}
+
+func Register(server *grpc.Server, store contribState.Store) {
+	defaultStore.impl = store
+	proto.RegisterStateStoreServer(server, defaultStore)
+	if trtnl, ok := store.(contribState.TransactionalStore); ok {
+		proto.RegisterTransactionalStateStoreServer(server, defaultStore)
+		defaultStore.transactional = trtnl
 	}
 }

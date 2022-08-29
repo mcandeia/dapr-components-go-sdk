@@ -19,8 +19,6 @@ import (
 	contribState "github.com/dapr/components-contrib/state"
 	"github.com/dapr/kit/logger"
 
-	proto "github.com/dapr/dapr/pkg/proto/components/v1"
-
 	"github.com/mcandeia/dapr-components-go-sdk/state/v1"
 	"google.golang.org/grpc"
 )
@@ -41,7 +39,7 @@ func UseStateStore(stateStore contribState.Store) Option {
 	return func(co *componentOpts) {
 		co.useGrpcServer = append(co.useGrpcServer, func(s *grpc.Server) {
 			svcLogger.Info("dapr state store was registered")
-			proto.RegisterStateStoreServer(s, state.NewWrapper(stateStore))
+			state.Register(s, stateStore)
 		})
 	}
 }
