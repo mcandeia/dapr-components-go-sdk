@@ -142,14 +142,34 @@ func (s *store) Get(_ context.Context, req *proto.GetRequest) (*proto.GetRespons
 	return internal.IfNotNil(resp, fromGetResponse), err
 }
 
+// dataParser is used to parse content by its content type
+var dataParser = map[string]func([]byte) (any, error){
+	"application/json": func(b []byte) (any, error) {
+		var result any
+		return result, json.Unmarshal(b, &result)
+	},
+}
+
 func toSetRequest(req *proto.SetRequest) *contribState.SetRequest {
+	var value any = req.Value
 	var contentType *string
 	if req.ContentType != "" {
 		contentType = &req.ContentType
 	}
+	if ct, ok := req.Metadata["contentType"]; ok {
+		contentType = &ct
+	}
+
+	if contentType != nil {
+		if parser, ok := dataParser[*contentType]; ok {
+			v, _ := parser(req.Value)
+			value = v
+		}
+	}
+
 	return &contribState.SetRequest{
 		Key:   req.Key,
-		Value: req.Value,
+		Value: value,
 		ETag: internal.IfNotNilP(req.Etag, func(f *common.Etag) string {
 			return f.Value
 		}),
