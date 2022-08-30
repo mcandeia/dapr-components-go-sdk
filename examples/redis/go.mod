@@ -2,7 +2,7 @@ module github.com/mcandeia/dapr-components-go-sdk/examples/redis
 
 go 1.19
 
-replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220829202438-ebb3b1b2ae36
+replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220830185157-91970b87116f
 
 replace github.com/mcandeia/dapr-components-go-sdk => ../../.
 

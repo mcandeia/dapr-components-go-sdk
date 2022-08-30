@@ -143,13 +143,18 @@ func (s *store) Get(_ context.Context, req *proto.GetRequest) (*proto.GetRespons
 }
 
 func toSetRequest(req *proto.SetRequest) *contribState.SetRequest {
+	var contentType *string
+	if req.ContentType != "" {
+		contentType = &req.ContentType
+	}
 	return &contribState.SetRequest{
 		Key:   req.Key,
 		Value: req.Value,
 		ETag: internal.IfNotNilP(req.Etag, func(f *common.Etag) string {
 			return f.Value
 		}),
-		Metadata: req.Metadata,
+		ContentType: contentType,
+		Metadata:    req.Metadata,
 		Options: internal.IfNotNil(req.Options, func(f *common.StateOptions) contribState.SetStateOption {
 			return contribState.SetStateOption{
 				Concurrency: toConcurrency(f.Concurrency),
@@ -209,10 +214,10 @@ func toTransactionalStateOperation(op *proto.TransactionalStateOperation) contri
 		operation contribState.OperationType
 	)
 	if delete := op.GetDelete(); delete != nil {
-		request = delete
+		request = toDeleteRequest(delete)
 		operation = contribState.Delete
 	} else {
-		request = op.GetSet()
+		request = toSetRequest(op.GetSet())
 		operation = contribState.Upsert
 	}
 
