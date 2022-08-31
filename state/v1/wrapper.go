@@ -240,10 +240,10 @@ func toTransactionalStateOperation(op *proto.TransactionalStateOperation) contri
 		operation contribState.OperationType
 	)
 	if delete := op.GetDelete(); delete != nil {
-		request = toDeleteRequest(delete)
+		request = *toDeleteRequest(delete)
 		operation = contribState.Delete
 	} else {
-		request = toSetRequest(op.GetSet())
+		request = *toSetRequest(op.GetSet())
 		operation = contribState.Upsert
 	}
 
