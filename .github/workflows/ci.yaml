@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Run Redis docker
         shell: bash
-        run: docker run -d -it redislabs/redisearch:latest -p 6379:6379
+        run: docker run -d -it -p 6379:6379 redislabs/redisearch:latest
 
       - name: Run Redis component
         shell: bash
