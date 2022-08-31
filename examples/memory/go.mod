@@ -24,6 +24,6 @@ require (
 	google.golang.org/protobuf v1.28.0 // indirect
 )
 
-replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220830185157-91970b87116f
+replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220831143640-efe8777979fa
 
 replace github.com/mcandeia/dapr-components-go-sdk => ../../.

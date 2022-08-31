@@ -133,6 +133,9 @@ func fromGetResponse(res *contribState.GetResponse) *proto.GetResponse {
 				Value: *etagValue,
 			}
 		}),
+		ContentType: internal.IfNotNil(res.ContentType, func(f *string) string {
+			return *f
+		}),
 		Metadata: res.Metadata,
 	}
 }
@@ -209,6 +212,9 @@ func fromBulkGetResponse(item contribState.BulkGetResponse) *proto.BulkStateItem
 		}),
 		Error:    item.Error,
 		Metadata: item.Metadata,
+		ContentType: internal.IfNotNil(item.ContentType, func(f *string) string {
+			return *f
+		}),
 	}
 }
 
@@ -297,8 +303,10 @@ func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryR
 						Value: *etagValue,
 					}
 				}),
-				Error:       item.Error,
-				ContentType: *item.ContentType,
+				Error: item.Error,
+				ContentType: internal.IfNotNil(item.ContentType, func(f *string) string {
+					return *f
+				}),
 			}
 		}),
 		Token:    resp.Token,
