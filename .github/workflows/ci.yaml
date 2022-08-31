@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           DAPR_COMPONENT_SOCKET_PATH=/tmp/socket.sock go run examples/redis/main.go &
-          until [ -f /tmp/socket.sock ]
+          until [ -S /tmp/socket.sock ]
           do
               sleep 5
               echo "waiting until component is ready"
