@@ -20,4 +20,4 @@ require (
 	google.golang.org/protobuf v1.28.0
 )
 
-replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220831143640-efe8777979fa
+replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220901142311-6cfceda8b284

@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Run Redis docker
         shell: bash
-        run: docker run -d -it -p 6379:6379 redislabs/redisearch:latest
+        run: docker run -d -v /tmp:/tmp -p 6379:6379 -e REDIS_REPLICATION_MODE=master redislabs/rejson:2.0.6
 
       - name: Run Redis component
         shell: bash
@@ -35,9 +35,27 @@ jobs:
         with:
           socket: /tmp/socket.sock
           metadata: |
-            redisHost: "localhost:6379"
+            redisHost: localhost:6379
             redisPassword: ""
-            initTimeout: "5m"
-            timeout: "100s"
+            queryIndexes: |
+              [
+                {
+                  "name": "qIndx",
+                  "indexes": [
+                    {
+                      "key": "message",
+                      "type": "TEXT"
+                    }
+                  ]
+                }
+              ]
+
           operations: |
+            - set
             - get
+            - transaction
+            - etag
+            - delete
+            - bulkset
+            - bulkdelete
+            - first-write
