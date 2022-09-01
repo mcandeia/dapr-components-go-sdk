@@ -59,3 +59,4 @@ jobs:
             - bulkset
             - bulkdelete
             - first-write
+            - query
