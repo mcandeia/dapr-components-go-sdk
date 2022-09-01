@@ -51,14 +51,14 @@ type store struct {
 var consistencyModels = map[common.StateOptions_StateConsistency]string{
 	common.StateOptions_CONSISTENCY_EVENTUAL:    consistencyEventual,
 	common.StateOptions_CONSISTENCY_STRONG:      consistencyStrong,
-	common.StateOptions_CONSISTENCY_UNSPECIFIED: consistencyStrong,
+	common.StateOptions_CONSISTENCY_UNSPECIFIED: "",
 }
 
 //nolint:nosnakecase
 func toConsistency(consistency common.StateOptions_StateConsistency) string {
 	c, ok := consistencyModels[consistency]
 	if !ok {
-		return consistencyStrong
+		return ""
 	}
 	return c
 }
@@ -67,14 +67,14 @@ func toConsistency(consistency common.StateOptions_StateConsistency) string {
 var concurrencyModels = map[common.StateOptions_StateConcurrency]string{
 	common.StateOptions_CONCURRENCY_FIRST_WRITE: concurrencyFirstWrite,
 	common.StateOptions_CONCURRENCY_LAST_WRITE:  concurrencyLastWrite,
-	common.StateOptions_CONCURRENCY_UNSPECIFIED: concurrencyLastWrite,
+	common.StateOptions_CONCURRENCY_UNSPECIFIED: "",
 }
 
 //nolint:nosnakecase
 func toConcurrency(concurrency common.StateOptions_StateConcurrency) string {
 	c, ok := concurrencyModels[concurrency]
 	if !ok {
-		return concurrencyLastWrite
+		return ""
 	}
 	return c
 }
