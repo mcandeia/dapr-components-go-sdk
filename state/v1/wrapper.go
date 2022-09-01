@@ -292,18 +292,33 @@ func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryR
 
 	// marshal and unmarshal query is necessary since the filters are built when unmarshalling the query value.
 	// TODO expose buildFilters function.
-	bts, err := json.Marshal(query)
+	btsQuery, err := json.Marshal(query)
 	if err != nil {
 		return nil, err
 	}
-	if err := query.UnmarshalJSON(bts); err != nil {
+
+	// FIXME no idea why its necessary to unmarshal it into a map before trying to unmarshalling to the query object.
+	var dict map[string]any
+
+	if err = json.Unmarshal(btsQuery, &dict); err != nil {
+		return nil, err
+	}
+
+	bts, err := json.Marshal(dict)
+	if err != nil {
+		return nil, err
+	}
+
+	var nq contribQuery.Query
+	if err := json.Unmarshal(bts, &nq); err != nil {
 		return nil, err
 	}
 
 	resp, err := s.querier.Query(&contribState.QueryRequest{
-		Query:    query,
+		Query:    nq,
 		Metadata: req.Metadata,
 	})
+
 	if err != nil {
 		return nil, err
 	}
