@@ -3,9 +3,8 @@ module github.com/mcandeia/dapr-components-go-sdk/examples/memory
 go 1.19
 
 require (
-	github.com/dapr/components-contrib v1.8.2
+	github.com/dapr/components-contrib v1.8.0-rc.1.0.20220901165827-19341e5a0ff4
 	github.com/dapr/kit v0.0.2
-	github.com/mcandeia/dapr-components-go-sdk v0.0.0-20220828173552-39ff56f2324d
 )
 
 require (

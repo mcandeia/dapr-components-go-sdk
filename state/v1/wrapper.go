@@ -17,6 +17,7 @@ import (
 	"context"
 	"encoding/json"
 
+	contribMetadata "github.com/dapr/components-contrib/metadata"
 	contribState "github.com/dapr/components-contrib/state"
 	contribQuery "github.com/dapr/components-contrib/state/query"
 
@@ -81,7 +82,7 @@ func toConcurrency(concurrency common.StateOptions_StateConcurrency) string {
 
 func (s *store) Init(ctx context.Context, metadata *proto.MetadataRequest) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, s.impl.Init(contribState.Metadata{
-		Properties: metadata.Properties,
+		Base: contribMetadata.Base{Properties: metadata.Properties},
 	})
 }
 
@@ -272,8 +273,9 @@ func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryR
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.querier.Query(&contribState.QueryRequest{
-		Query: contribQuery.Query{
+
+	query := contribQuery.Query{
+		QueryFields: contribQuery.QueryFields{
 			Filters: filters,
 			Sort: internal.Map(req.Query.Sort, func(s *proto.Sorting) contribQuery.Sorting {
 				return contribQuery.Sorting{
@@ -285,8 +287,21 @@ func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryR
 				Limit: int(req.Query.Pagination.Limit),
 				Token: req.Query.Pagination.Token,
 			},
-			Filter: nil,
 		},
+	}
+
+	// marshal and unmarshal query is necessary since the filters are built when unmarshalling the query value.
+	// TODO expose buildFilters function.
+	bts, err := json.Marshal(query)
+	if err != nil {
+		return nil, err
+	}
+	if err := query.UnmarshalJSON(bts); err != nil {
+		return nil, err
+	}
+
+	resp, err := s.querier.Query(&contribState.QueryRequest{
+		Query:    query,
 		Metadata: req.Metadata,
 	})
 	if err != nil {

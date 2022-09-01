@@ -7,9 +7,8 @@ replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220901142311-6
 replace github.com/mcandeia/dapr-components-go-sdk => ../../.
 
 require (
-	github.com/dapr/components-contrib v1.8.2
+	github.com/dapr/components-contrib v1.8.0-rc.1.0.20220901165827-19341e5a0ff4
 	github.com/dapr/kit v0.0.2
-	github.com/mcandeia/dapr-components-go-sdk v0.0.0-00010101000000-000000000000
 )
 
 require (
