@@ -196,7 +196,7 @@ func (s *store) Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 }
 
 func (s *store) BulkDelete(_ context.Context, req *proto.BulkDeleteRequest) (*emptypb.Empty, error) {
-	return nil, s.impl.BulkDelete(internal.Map(req.Items, func(delReq *proto.DeleteRequest) contribState.DeleteRequest {
+	return &emptypb.Empty{}, s.impl.BulkDelete(internal.Map(req.Items, func(delReq *proto.DeleteRequest) contribState.DeleteRequest {
 		return *toDeleteRequest(delReq)
 	}))
 }
