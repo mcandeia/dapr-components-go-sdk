@@ -318,7 +318,6 @@ func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryR
 		Query:    nq,
 		Metadata: req.Metadata,
 	})
-
 	if err != nil {
 		return nil, err
 	}
