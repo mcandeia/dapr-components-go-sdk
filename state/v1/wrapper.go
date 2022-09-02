@@ -342,15 +342,15 @@ func (s *store) Query(_ context.Context, req *proto.QueryRequest) (*proto.QueryR
 	}, nil
 }
 
-func Register(server *grpc.Server, store contribState.Store) {
+func Register(server *grpc.Server, store Store) {
 	defaultStore.impl = store
 	proto.RegisterStateStoreServer(server, defaultStore)
-	if trtnl, ok := store.(contribState.TransactionalStore); ok {
+	if trtnl, ok := store.(TransactionalStore); ok {
 		proto.RegisterTransactionalStateStoreServer(server, defaultStore)
 		defaultStore.transactional = trtnl
 	}
 
-	if querier, ok := store.(contribState.Querier); ok {
+	if querier, ok := store.(Querier); ok {
 		proto.RegisterQueriableStateStoreServer(server, defaultStore)
 		defaultStore.querier = querier
 	}

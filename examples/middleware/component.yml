@@ -10,15 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-apiVersion: dapr.io/v1alpha1
-kind: PluggableComponent
-metadata:
-  name: debug
-spec:
-  type: middleware.http
-  version: v1
 
----
 apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
@@ -26,4 +18,3 @@ metadata:
 spec:
   type: middleware.http.debug
   version: v1
-

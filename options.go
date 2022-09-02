@@ -18,7 +18,9 @@ import (
 
 	"github.com/dapr/kit/logger"
 
+	http "github.com/mcandeia/dapr-components-go-sdk/middleware/v1"
 	"github.com/mcandeia/dapr-components-go-sdk/state/v1"
+
 	"google.golang.org/grpc"
 )
 
@@ -39,6 +41,16 @@ func UseStateStore(stateStore state.Store) Option {
 		co.useGrpcServer = append(co.useGrpcServer, func(s *grpc.Server) {
 			svcLogger.Info("dapr state store was registered")
 			state.Register(s, stateStore)
+		})
+	}
+}
+
+// UseStateStore sets the component state store implementation.
+func UseHttpMiddleware(middleware http.Middleware) Option {
+	return func(co *componentOpts) {
+		co.useGrpcServer = append(co.useGrpcServer, func(s *grpc.Server) {
+			svcLogger.Info("dapr middleware was registered")
+			http.Register(s, middleware)
 		})
 	}
 }

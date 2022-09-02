@@ -3,9 +3,13 @@ module github.com/mcandeia/dapr-components-go-sdk
 go 1.19
 
 require (
+	github.com/andybalholm/brotli v1.0.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasthttp v1.31.1-0.20211216042702-258a4c17b4f4 // indirect
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
