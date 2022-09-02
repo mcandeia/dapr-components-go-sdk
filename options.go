@@ -16,7 +16,6 @@ package dapr
 import (
 	"errors"
 
-	contribState "github.com/dapr/components-contrib/state"
 	"github.com/dapr/kit/logger"
 
 	"github.com/mcandeia/dapr-components-go-sdk/state/v1"
@@ -35,7 +34,7 @@ type componentOpts struct {
 type Option = func(*componentOpts)
 
 // UseStateStore sets the component state store implementation.
-func UseStateStore(stateStore contribState.Store) Option {
+func UseStateStore(stateStore state.Store) Option {
 	return func(co *componentOpts) {
 		co.useGrpcServer = append(co.useGrpcServer, func(s *grpc.Server) {
 			svcLogger.Info("dapr state store was registered")

@@ -43,9 +43,9 @@ const (
 var defaultStore = &store{}
 
 type store struct {
-	impl          contribState.Store
-	transactional contribState.TransactionalStore
-	querier       contribState.Querier
+	impl          Store
+	transactional TransactionalStore
+	querier       Querier
 }
 
 //nolint:nosnakecase
