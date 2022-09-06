@@ -47,6 +47,7 @@ jobs:
         uses: mcandeia/action-dapr-conformance-tests@v1
         with:
           socket: /tmp/socket.sock
+          type: state
           metadata: |
             redisHost: localhost:6379
             redisPassword: ""
