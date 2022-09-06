@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample
+  labels:
+    app: sample
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample
+  template:
+    metadata:
+      labels:
+        app: sample
+      annotations:
+        dapr.io/unix-domain-socket-path: "/var/run"
+        dapr.io/app-id: "backend"
+        dapr.io/enabled: "true"
+        dapr.io/sidecar-listen-addresses: "0.0.0.0"
+    spec:
+      volumes:
+      - name: dapr-unix-domain-socket
+        emptyDir: {}
+      containers:
+        - name: in-memory-pluggable
+          volumeMounts:
+              - name: dapr-unix-domain-socket
+                mountPath: /dapr-unix-domain-sockets
+          image: tmacam/dapr-memstore-java:latest
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: DAPR_COMPONENT_SOCKET_PATH
+              value: /dapr-unix-domain-sockets/dapr-state.store-v1-default.sock

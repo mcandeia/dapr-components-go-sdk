@@ -14,7 +14,7 @@ limitations under the License.
 package main
 
 import (
-	"strings"
+	"net/http"
 
 	contribMiddleware "github.com/dapr/components-contrib/middleware"
 	dapr "github.com/mcandeia/dapr-components-go-sdk"
@@ -25,12 +25,7 @@ type myMiddleware struct{}
 
 func (m *myMiddleware) GetHandler(metadata contribMiddleware.Metadata) (func(httpMiddleware.MiddlewareController) error, error) {
 	return func(mc httpMiddleware.MiddlewareController) error {
-		mc.Next()
-		reqBody := string(mc.GetResponseBody())
-		mc.SetResponseHeaders(map[string]string{
-			"x-marcos-header": "10",
-		})
-		mc.SetResponseBody([]byte(strings.ReplaceAll(reqBody, "a", "x")))
+		mc.SetStatusCode(http.StatusOK)
 		return nil
 	}, nil
 }

@@ -1,0 +1,19 @@
+apiVersion: dapr.io/v1alpha1
+kind: PluggableComponent
+metadata:
+  name: store
+spec:
+  type: state
+  version: v1
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: default
+spec:
+  type: state.store
+  version: v1
+  initTimeout: 10s
+  metadata:
+    - name: timeout
+      value: 100s
