@@ -30,7 +30,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 const (
@@ -80,13 +79,13 @@ func toConcurrency(concurrency common.StateOptions_StateConcurrency) string {
 	return c
 }
 
-func (s *store) Init(ctx context.Context, metadata *proto.MetadataRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.impl.Init(contribState.Metadata{
-		Base: contribMetadata.Base{Properties: metadata.Properties},
+func (s *store) Init(ctx context.Context, initReq *proto.InitRequest) (*proto.InitResponse, error) {
+	return &proto.InitResponse{}, s.impl.Init(contribState.Metadata{
+		Base: contribMetadata.Base{Properties: initReq.Metadata.Properties},
 	})
 }
 
-func (s *store) Features(context.Context, *emptypb.Empty) (*proto.FeaturesResponse, error) {
+func (s *store) Features(context.Context, *proto.FeaturesRequest) (*proto.FeaturesResponse, error) {
 	features := &proto.FeaturesResponse{
 		Feature: internal.Map(s.impl.Features(), func(f contribState.Feature) string {
 			return string(f)
@@ -112,8 +111,8 @@ func toDeleteRequest(req *proto.DeleteRequest) *contribState.DeleteRequest {
 	}
 }
 
-func (s *store) Delete(_ context.Context, req *proto.DeleteRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.impl.Delete(toDeleteRequest(req))
+func (s *store) Delete(_ context.Context, req *proto.DeleteRequest) (*proto.DeleteResponse, error) {
+	return &proto.DeleteResponse{}, s.impl.Delete(toDeleteRequest(req))
 }
 
 func toGetRequest(req *proto.GetRequest) *contribState.GetRequest {
@@ -188,16 +187,16 @@ func toSetRequest(req *proto.SetRequest) *contribState.SetRequest {
 	}
 }
 
-func (s *store) Set(_ context.Context, req *proto.SetRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.impl.Set(toSetRequest(req))
+func (s *store) Set(_ context.Context, req *proto.SetRequest) (*proto.SetResponse, error) {
+	return &proto.SetResponse{}, s.impl.Set(toSetRequest(req))
 }
 
-func (s *store) Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, nil
+func (s *store) Ping(context.Context, *proto.PingRequest) (*proto.PingResponse, error) {
+	return &proto.PingResponse{}, nil
 }
 
-func (s *store) BulkDelete(_ context.Context, req *proto.BulkDeleteRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.impl.BulkDelete(internal.Map(req.Items, func(delReq *proto.DeleteRequest) contribState.DeleteRequest {
+func (s *store) BulkDelete(_ context.Context, req *proto.BulkDeleteRequest) (*proto.BulkDeleteResponse, error) {
+	return &proto.BulkDeleteResponse{}, s.impl.BulkDelete(internal.Map(req.Items, func(delReq *proto.DeleteRequest) contribState.DeleteRequest {
 		return *toDeleteRequest(delReq)
 	}))
 }
@@ -229,8 +228,8 @@ func (s *store) BulkGet(_ context.Context, req *proto.BulkGetRequest) (*proto.Bu
 	}, err
 }
 
-func (s *store) BulkSet(_ context.Context, req *proto.BulkSetRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.impl.BulkSet(internal.Map(req.Items, func(setReq *proto.SetRequest) contribState.SetRequest {
+func (s *store) BulkSet(_ context.Context, req *proto.BulkSetRequest) (*proto.BulkSetResponse, error) {
+	return &proto.BulkSetResponse{}, s.impl.BulkSet(internal.Map(req.Items, func(setReq *proto.SetRequest) contribState.SetRequest {
 		return *toSetRequest(setReq)
 	}))
 }
@@ -254,12 +253,12 @@ func toTransactionalStateOperation(op *proto.TransactionalStateOperation) contri
 	}
 }
 
-func (s *store) Multi(_ context.Context, req *proto.TransactionalStateRequest) (*emptypb.Empty, error) {
+func (s *store) Multi(_ context.Context, req *proto.TransactionalStateRequest) (*proto.TransactionalStateResponse, error) {
 	if s.transactional == nil {
-		return &emptypb.Empty{}, status.Errorf(codes.Unimplemented, "method Multi not implemented")
+		return &proto.TransactionalStateResponse{}, status.Errorf(codes.Unimplemented, "method Multi not implemented")
 	}
 
-	return &emptypb.Empty{}, s.transactional.Multi(&contribState.TransactionalStateRequest{
+	return &proto.TransactionalStateResponse{}, s.transactional.Multi(&contribState.TransactionalStateRequest{
 		Operations: internal.Map(req.Operations, toTransactionalStateOperation),
 		Metadata:   req.Metadata,
 	})
