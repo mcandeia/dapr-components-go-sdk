@@ -2,7 +2,7 @@ module github.com/mcandeia/dapr-components-go-sdk/examples/middleware
 
 go 1.19
 
-replace github.com/dapr/dapr => /Users/marcoscandeia/workspace/dapr/
+replace github.com/dapr/dapr => github.com/mcandeia/dapr v0.0.0-20220907183104-ce42fc911ede
 
 replace github.com/mcandeia/dapr-components-go-sdk => ../../.
 

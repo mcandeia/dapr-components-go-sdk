@@ -23,7 +23,6 @@ import (
 	proto "github.com/dapr/dapr/pkg/proto/components/v1"
 
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var defaultMiddleware = &middleware{}
@@ -57,20 +56,20 @@ func (m *middleware) Handle(svc proto.HttpMiddleware_HandleServer) (err error) {
 	return err
 }
 
-func (m *middleware) Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, nil
+func (m *middleware) Ping(context.Context, *proto.PingRequest) (*proto.PingResponse, error) {
+	return &proto.PingResponse{}, nil
 }
 
-func (s *middleware) Init(ctx context.Context, metadata *proto.MetadataRequest) (*emptypb.Empty, error) {
+func (s *middleware) Init(ctx context.Context, req *proto.MiddlewareInitRequest) (*proto.MiddlewareInitResponse, error) {
 	handler, err := s.middlewareFactory.GetHandler(contribMiddleware.Metadata{
-		Base: contribMetadata.Base{Properties: metadata.Properties},
+		Base: contribMetadata.Base{Properties: req.Metadata.Properties},
 	})
 	if err != nil {
 		return nil, err
 	}
 	s.handler = handler
 
-	return &emptypb.Empty{}, nil
+	return &proto.MiddlewareInitResponse{}, nil
 }
 
 func Register(server *grpc.Server, middleware Middleware) {

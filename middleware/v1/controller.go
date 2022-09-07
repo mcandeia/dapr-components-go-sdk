@@ -55,7 +55,7 @@ type middlewareController struct {
 	client proto.HttpMiddleware_HandleServer //nolint:nosnakecase
 }
 
-func (m *middlewareController) abortOnErr(err error) {
+func abortOnErr(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -70,13 +70,13 @@ func asResponse[T any](resp *proto.CommandResponse) (T, error) {
 }
 
 func sendAndRecv[T any](m *middlewareController, command *proto.Command) T {
-	m.abortOnErr(m.client.Send(command))
+	abortOnErr(m.client.Send(command))
 
 	resp, err := m.client.Recv()
-	m.abortOnErr(err)
+	abortOnErr(err)
 
 	commandResp, err := asResponse[T](resp)
-	m.abortOnErr(err)
+	abortOnErr(err)
 
 	return commandResp
 }
@@ -91,7 +91,7 @@ func (m *middlewareController) GetRequestBody() []byte {
 }
 
 func (m *middlewareController) SetRequestBody(data []byte) {
-	m.abortOnErr(
+	abortOnErr(
 		m.client.Send(&proto.Command{
 			Command: &proto.Command_SetReqBody{
 				SetReqBody: &proto.SetRequestBodyCommand{
@@ -112,7 +112,7 @@ func (m *middlewareController) GetResponseBody() []byte {
 }
 
 func (m *middlewareController) SetResponseBody(data []byte) {
-	m.abortOnErr(m.client.Send(&proto.Command{
+	abortOnErr(m.client.Send(&proto.Command{
 		Command: &proto.Command_SetRespBody{
 			SetRespBody: &proto.SetResponseBodyCommand{
 				Data: data,
@@ -136,7 +136,7 @@ func (m *middlewareController) GetRequestHeaders() HTTPHeaders {
 }
 
 func (m *middlewareController) SetRequestHeaders(headers HTTPHeaders) {
-	m.abortOnErr(
+	abortOnErr(
 		m.client.Send(&proto.Command{
 			Command: &proto.Command_SetReqHeaders{
 				SetReqHeaders: &proto.SetRequestHeadersCommand{
@@ -160,7 +160,7 @@ func (m *middlewareController) GetResponseHeaders() map[string]string {
 }
 
 func (m *middlewareController) SetResponseHeaders(data map[string]string) {
-	m.abortOnErr(
+	abortOnErr(
 		m.client.Send(&proto.Command{
 			Command: &proto.Command_SetRespHeaders{
 				SetRespHeaders: &proto.SetResponseHeadersCommand{
@@ -182,7 +182,7 @@ func (m *middlewareController) GetStatusCode() int {
 }
 
 func (m *middlewareController) SetStatusCode(statusCode int) {
-	m.abortOnErr(
+	abortOnErr(
 		m.client.Send(&proto.Command{
 			Command: &proto.Command_SetRespStatus{
 				SetRespStatus: &proto.SetResponseStatusCodeCommand{
@@ -194,7 +194,7 @@ func (m *middlewareController) SetStatusCode(statusCode int) {
 }
 
 func (m *middlewareController) Next() {
-	m.abortOnErr(
+	abortOnErr(
 		m.client.Send(&proto.Command{
 			Command: &proto.Command_ExecNext{
 				ExecNext: &proto.ExecNextCommand{},
